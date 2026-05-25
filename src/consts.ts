@@ -4,7 +4,7 @@ export const SITE = {
   description:
     "Gentle, expert grooming for cats and dogs in Santa Monica, California. Calm handling, hand-finished cuts, and honest neighborhood prices — because grooming, done well, is an art form.",
   url: "https://thepetaffaire.com",
-  email: "hello@thepetaffaire.com",
+  email: "woof@thepetaffaire.com",
   phone: "(310) 396-0804",
   phoneHref: "tel:+13103960804",
   address: {
