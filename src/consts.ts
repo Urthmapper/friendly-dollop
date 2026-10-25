@@ -2,7 +2,17 @@ export const SITE = {
   name: "The Pet Affaire",
   tagline: "Gentle Grooming. Tail-Wagging Results.",
   description:
-    "Gentle, expert grooming for cats and dogs in Santa Monica, California. Calm handling, hand-finished cuts, and honest neighborhood prices — because grooming, done well, is an art form.",
+    "Gentle, hand-finished grooming for cats and dogs in Santa Monica, California. One pet at a time, honest prices, and the same careful hands since 2004.",
+  founded: 2004,
+  founder: {
+    name: "Rodney",
+    short: "Rod",
+    role: "Owner & groomer",
+  },
+  cofounder: {
+    name: "Frank Broccoli",
+    years: "2004 – 2022",
+  },
   url: "https://thepetaffaire.com",
   email: "hello@thepetaffaire.com",
   phone: "(310) 396-0804",
@@ -101,7 +111,7 @@ export const FONTS = {
 //   • iPhone "Slo-mo" or any well-lit phone clip works great
 //   • Avoid sudden cuts / flashes; viewers will see a calm loop
 export const HERO_MEDIA = {
-  kind: "video" as "placeholder" | "image" | "video",
+  kind: "image" as "placeholder" | "image" | "video",
   // For "image" mode:
   image: "/hero/photo.jpg",
   // For "video" mode:
@@ -109,7 +119,7 @@ export const HERO_MEDIA = {
   webm: "/hero/video.webm",
   poster: "/hero/poster.jpg",
   // Shown to screen readers + reduced-motion users:
-  alt: "A pet being gently groomed at The Pet Affaire studio in Santa Monica.",
+  alt: "A Yorkshire terrier being scissor-finished by hand at The Pet Affaire studio in Santa Monica.",
   // Always-on subtitle overlay, synced to video.currentTime.
   // Times are seconds. Set to [] to hide the caption strip.
   captions: [
@@ -124,6 +134,7 @@ export const HERO_MEDIA = {
 
 export const NAV = [
   { label: "Services", href: "/services" },
+  { label: "First Visit", href: "/first-visit" },
   { label: "Gallery", href: "/gallery" },
   { label: "About", href: "/about" },
   { label: "Journal", href: "/journal" },
@@ -132,6 +143,6 @@ export const NAV = [
 
 // Booking sub-routes (used by Header + Footer to link to intake/book together).
 export const BOOK_LINKS = [
-  { label: "Online booking (intake form)", href: "/intake" },
-  { label: "Pick a time", href: "/book" },
+  { label: "Book online", href: "/book" },
+  { label: "New-client intake", href: "/intake" },
 ] as const;

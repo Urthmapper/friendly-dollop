@@ -1,23 +1,42 @@
 ---
 import { Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Section from "@/components/Section.astro";
+import { SITE } from "@/consts";
 import { galleryItems } from "@/data/gallery";
-const meetGreet = galleryItems.meetGreet.src;
+import studio from "@/assets/hero/studio.jpg";
+
+// Portraits are picked up automatically from src/assets/people/:
+//   rod.{jpg,jpeg,png,webp}    → Rod's portrait (falls back to a studio shot)
+//   frank.{jpg,jpeg,png,webp}  → Frank's photo (section renders without one)
+const people = import.meta.glob<ImageMetadata>("/src/assets/people/*.{jpg,jpeg,png,webp}", {
+  eager: true,
+  import: "default",
+});
+const find = (name: string) =>
+  Object.entries(people).find(([p]) => new RegExp(`/${name}\\.(jpg|jpeg|png|webp)$`, "i").test(p))?.[1] ?? null;
+const rodPortrait = find("rod");
+const frankPhoto = find("frank");
+const rodPhoto = rodPortrait ?? studio;
 ---
 
-<BaseLayout title="About" description="A neighborhood grooming studio in Santa Monica — gentle handling, expert finish, fair prices. For cats, dogs, and the families who love them.">
-  <Section eyebrow="A little about us" title="We call our spa &lsquo;The Pet Affaire&rsquo;.">
+<BaseLayout
+  title={`${SITE.founder.short} & the Studio`}
+  description={`The Pet Affaire is a one-groomer studio on Lincoln Boulevard, opened by ${SITE.founder.name} and ${SITE.cofounder.name} in ${SITE.founded}. Gentle handling, hand-finished cuts, honest prices.`}
+>
+  <Section eyebrow={`Santa Monica · Since ${SITE.founded}`} title={`${SITE.founder.short} and the studio.`}>
     <div class="grid gap-12 md:grid-cols-12">
       <div class="md:col-span-7 space-y-5 text-[17px] leading-relaxed text-black/80">
-        <p class="font-display text-2xl text-black/85 italic">
-          It's more than just grooming. It's our art form.
+        <p class="font-display text-2xl text-black/85 md:text-3xl leading-snug">
+          The Pet Affaire is a small grooming studio on Lincoln Boulevard. {SITE.founder.name},
+          who goes by {SITE.founder.short}, opened it with {SITE.cofounder.name} in {SITE.founded}
+          and has run it ever since.
         </p>
         <p>
-          The Pet Affaire is a small grooming studio in Santa Monica, and we've been part of this
-          neighborhood for a long time. The work hasn't changed because the things we care about
-          haven't changed: how the pet feels, how the groom looks, and whether you can afford to
-          come back.
+          It is not a chain and it is not a spa with a waiting room. It's one table, one groomer,
+          and one pet at a time. You hand your dog or cat to {SITE.founder.short} at drop-off,
+          and {SITE.founder.short} hands them back at pickup. Nothing in between is delegated.
         </p>
         <p>
           <strong class="text-black">Gentle, safe, calm.</strong> The first job is always how the
@@ -25,15 +44,15 @@ const meetGreet = galleryItems.meetGreet.src;
           right call. No all-day waits, no rushed hands.
         </p>
         <p>
-          <strong class="text-black">Precision and craft.</strong> Our groomers have built a
-          reputation one dog and one cat at a time. Scissor finishing on every cut, a real eye for
-          line and proportion, and the patience to do it right.
+          <strong class="text-black">Precision and craft.</strong> Scissor finishing on every
+          cut, a real eye for line and proportion, and the patience to do it right. A reputation
+          built one dog and one cat at a time, over more than twenty years.
         </p>
         <p>
-          <strong class="text-black">Community and fair value.</strong> We've watched a lot of pet
-          spas in Los Angeles drift toward assembly-line work at boutique prices. We've gone the
-          other direction: keep the quality high, keep the prices honest, treat every client like
-          a neighbor. Most of ours have been with us for years — some for decades.
+          <strong class="text-black">Honest, no-nonsense value.</strong> A lot of pet spas in Los
+          Angeles have drifted toward assembly-line work at boutique prices. We've gone the other
+          direction: keep the quality high, keep the prices fair, say the number before we start,
+          and treat every client like a neighbor. Most of ours have been with us for years.
         </p>
       </div>
       <aside class="md:col-span-5">
@@ -42,76 +61,112 @@ const meetGreet = galleryItems.meetGreet.src;
             aria-hidden="true"
             class="absolute inset-0 -z-10 rounded-3xl bg-[var(--color-rose)] opacity-45 translate-x-3 translate-y-3 md:translate-x-4 md:translate-y-4"
           ></span>
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 64 64"
-            class="pointer-events-none absolute -top-7 -right-5 h-20 w-20 rotate-[18deg] text-[var(--color-clay)] opacity-55 md:h-24 md:w-24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.4"
-            stroke-linecap="round"
-          >
-            <ellipse cx="32" cy="44" rx="14" ry="11" />
-            <ellipse cx="13" cy="26" rx="5" ry="7" />
-            <ellipse cx="25" cy="14" rx="5" ry="7" />
-            <ellipse cx="39" cy="14" rx="5" ry="7" />
-            <ellipse cx="51" cy="26" rx="5" ry="7" />
-          </svg>
           <div class="relative aspect-[4/5] overflow-hidden rounded-3xl bg-[var(--color-bone)]">
             <Picture
-              src={meetGreet}
+              src={rodPhoto}
               formats={["avif", "webp"]}
-              alt="A cream Shih Tzu and a small black puppy saying hello after their groom at The Pet Affaire."
+              alt={rodPortrait ? `${SITE.founder.name}, owner and groomer at The Pet Affaire.` : "Scissor finishing at The Pet Affaire studio."}
               widths={[400, 600, 800, 1000]}
               sizes="(max-width: 768px) 100vw, 42vw"
+              loading="eager"
+              decoding="async"
+              class="h-full w-full object-cover"
+            />
+          </div>
+          <p class="mt-3 text-xs uppercase tracking-[0.2em] text-black/50">
+            {rodPortrait ? `${SITE.founder.name} · ${SITE.founder.role}` : "At the table"}
+          </p>
+        </div>
+      </aside>
+    </div>
+  </Section>
+
+  <Section eyebrow="Remembering" title={`${SITE.cofounder.name}, ${SITE.cofounder.years}.`} bg="bone" accent="clay">
+    <div class="grid gap-10 md:grid-cols-12">
+      {frankPhoto && (
+        <div class="md:col-span-4">
+          <div class="aspect-[4/5] overflow-hidden rounded-3xl bg-[var(--color-mist)]">
+            <Picture
+              src={frankPhoto}
+              formats={["avif", "webp"]}
+              alt={`${SITE.cofounder.name}, co-founder of The Pet Affaire.`}
+              widths={[400, 600, 800]}
+              sizes="(max-width: 768px) 100vw, 33vw"
               loading="lazy"
               decoding="async"
               class="h-full w-full object-cover"
             />
           </div>
         </div>
-      </aside>
+      )}
+      <div class={frankPhoto ? "md:col-span-8 md:pl-4" : "md:col-span-8"}>
+        <p class="max-w-2xl text-[17px] leading-relaxed text-black/80">
+          Frank was the backbone of this place. He had a roaring passion for dogs and for the
+          craft of grooming, and he set the standard everything here is still measured against:
+          the animal comes first, the finish is done by hand, and nobody gets rushed. He passed
+          away in 2022.
+        </p>
+        <p class="mt-5 max-w-2xl text-[17px] leading-relaxed text-black/80">
+          The studio still runs his way. When your dog leaves looking right, that's Frank's work
+          too.
+        </p>
+        <p class="mt-6 font-display text-xl italic text-black/65">— {SITE.founder.short}</p>
+      </div>
     </div>
-  </Section>
-
-  <Section eyebrow="Our Pet Affaire Promise" title="Calm hands. Glowing coats. Trust that builds, one groom at a time." bg="rose" accent="rose">
-    <ul class="grid gap-6 md:grid-cols-3">
-      <li class="rounded-3xl border border-black/10 bg-white p-7">
-        <p class="text-xs uppercase tracking-[0.22em] text-[var(--color-clay)]">Hypoallergenic care</p>
-        <h3 class="mt-3 font-display text-2xl">Top-tier products, tailored.</h3>
-        <p class="mt-3 text-[15px] leading-relaxed text-black/75">
-          We use hypoallergenic, top-tier grooming products chosen to meet your pet's specific
-          sensitivities — from the shampoo on their skin to the conditioner left in.
-        </p>
-      </li>
-      <li class="rounded-3xl border border-black/10 bg-white p-7">
-        <p class="text-xs uppercase tracking-[0.22em] text-[var(--color-clay)]">Spa, not assembly line</p>
-        <h3 class="mt-3 font-display text-2xl">They leave glowing.</h3>
-        <p class="mt-3 text-[15px] leading-relaxed text-black/75">
-          From deep conditioning treatments to calming aromatherapy rinses, your pet leaves the
-          studio softer, brighter, and more relaxed than when they arrived.
-        </p>
-      </li>
-      <li class="rounded-3xl border border-black/10 bg-white p-7">
-        <p class="text-xs uppercase tracking-[0.22em] text-[var(--color-clay)]">Empathy, always</p>
-        <h3 class="mt-3 font-display text-2xl">We meet pets where they are.</h3>
-        <p class="mt-3 text-[15px] leading-relaxed text-black/75">
-          From shy rescues to high-energy pups, we adjust our pace and handling with empathy.
-          Our calm, loving process builds trust — one groom at a time.
-        </p>
-      </li>
-    </ul>
-    <p class="mt-12 font-display text-2xl md:text-3xl italic text-black/85 max-w-3xl">
-      Grooming That Respects. Every Pet. Every Time.
-    </p>
   </Section>
 
   <Section eyebrow="Our promises" title="What we'll always do.">
     <ul class="grid gap-6 md:grid-cols-2 text-[15px] leading-relaxed text-black/75">
-      <li><strong class="text-black">Hand-finished.</strong> Scissor finishing on every cut, every time.</li>
-      <li><strong class="text-black">Honest pricing.</strong> If a groom is going to cost more, you'll hear it before we begin — never after.</li>
-      <li><strong class="text-black">Welfare-first.</strong> If a groom isn't safe to finish, we stop and explain why. We don't push through for the sake of a finished cut.</li>
-      <li><strong class="text-black">Open communication.</strong> Real-time texts on arrival, mid-groom, and ready-for-pickup so nothing surprises you.</li>
+      <li class="rounded-2xl border border-black/10 bg-white p-6"><strong class="text-black">Hand-finished.</strong> Scissor finishing on every cut, every time.</li>
+      <li class="rounded-2xl border border-black/10 bg-white p-6"><strong class="text-black">Honest pricing.</strong> If a groom is going to cost more, you'll hear it before we begin — never after.</li>
+      <li class="rounded-2xl border border-black/10 bg-white p-6"><strong class="text-black">Welfare-first.</strong> If a groom isn't safe to finish, we stop and explain why. We don't push through for the sake of a finished cut.</li>
+      <li class="rounded-2xl border border-black/10 bg-white p-6"><strong class="text-black">Open communication.</strong> A text on arrival, mid-groom, and at ready-for-pickup so nothing surprises you.</li>
     </ul>
+  </Section>
+
+  <Section eyebrow="What we won't do" title="A short list, on purpose." bg="rose" accent="rose">
+    <ul class="grid gap-6 md:grid-cols-3 text-[15px] leading-relaxed text-black/75">
+      <li><strong class="text-black">We won't kennel your pet for the day.</strong> Drop-off is in the morning, pickup is at 2 PM, and the time in between is spent on the table, not in a crate.</li>
+      <li><strong class="text-black">We won't sedate.</strong> That's a vet's call, not a groomer's. One pet at a time in a quiet room means most pets don't need it.</li>
+      <li><strong class="text-black">We won't brush out matting that hurts.</strong> If a coat is matted to the skin, the kind cut is a short one. We'll tell you up front and never charge for de-matting we shouldn't be doing.</li>
+    </ul>
+  </Section>
+
+  <Section eyebrow="Products" title="Hypoallergenic, chosen per pet.">
+    <div class="grid gap-10 md:grid-cols-12">
+      <p class="md:col-span-7 max-w-xl text-[17px] leading-relaxed text-black/75">
+        We use top-tier hypoallergenic shampoos and conditioners, picked to match your pet's skin
+        and coat. Deep conditioning, calming rinses, and a blueberry-oatmeal facial are available
+        as <a href="/services#add-ons" class="underline underline-offset-4 hover:text-black">add-ons</a>.
+        Tell us about allergies at booking and we'll work around them.
+      </p>
+      <div class="md:col-span-5">
+        <div class="aspect-[5/4] overflow-hidden rounded-3xl bg-[var(--color-bone)]">
+          <Picture
+            src={galleryItems.meetGreet.src}
+            formats={["avif", "webp"]}
+            alt={galleryItems.meetGreet.alt}
+            widths={[400, 600, 800]}
+            sizes="(max-width: 768px) 100vw, 40vw"
+            loading="lazy"
+            decoding="async"
+            class="h-full w-full object-cover"
+          />
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <Section bg="ink">
+    <div class="grid items-center gap-8 md:grid-cols-2">
+      <div>
+        <h2 class="font-display text-4xl md:text-5xl leading-tight">Come meet {SITE.founder.short}.</h2>
+        <p class="mt-4 max-w-md text-current/75">First visit? Read what to expect, then pick a drop-off time.</p>
+      </div>
+      <div class="flex flex-wrap gap-3 md:justify-end">
+        <a href="/first-visit" class="rounded-full border border-white/30 px-5 py-3 text-sm hover:border-white/70">Your first visit</a>
+        <a href="/book" class="rounded-full bg-[var(--color-cream)] px-5 py-3 text-sm text-[var(--color-ink)] hover:bg-white">Book online</a>
+      </div>
+    </div>
   </Section>
 </BaseLayout>

@@ -44,6 +44,29 @@ netlify.toml          Build + security headers
 5. **Open Graph image** — put a 1200×630 share image at `public/og-default.jpg`.
 6. **Reviews** — replace the placeholder review files in `src/content/reviews/` with your real ones (one Markdown file per review).
 
+## Booking — Cal.com setup checklist (do this in the Cal.com dashboard)
+
+The site embeds Cal.com on `/book`. The embed is only as good as the event-type settings behind it. Work through this once:
+
+1. **One event type per service**, so the calendar knows how long each groom takes:
+   - `full-groom` — 150 min · `bath-tidy` — 75 min · `cat-groom` — 90 min
+   - Buffer 15 min after each. Minimum notice 24 h. Booking limit: 1 per slot.
+   - Then set `calLink` in `src/consts.ts` to the **team/collective page** (e.g. `thepetaffaire`) so the embed shows all three, or keep a single `groom` event if you'd rather pick the service in a question.
+2. **Availability = the drop-off window.** Tue – Sat, 7:30 – 10:30 AM only. Nobody should be able to request a 1 PM drop-off you'll have to decline.
+3. **Booking questions** (Event type › Advanced › Booking questions). These are the "everyone on the same page" fields:
+   - Pet's name · Breed · Approx. weight (lbs) · Last groom date · Matting / skin issues (long text) · Temperament notes (long text)
+   - Required checkbox: "My pet's vaccinations are current (rabies + DHPP for dogs, FVRCP for cats)"
+   - Required checkbox: "I understand cancellations under 24 h / no-shows are a 50% fee"
+4. **Confirmation.** Turn on **Requires confirmation** for new clients only (Advanced › Requires confirmation › "only for first-time bookers" if on a plan that supports it; otherwise leave it on and confirm from your phone). Returning clients get instant confirmation.
+5. **Workflows** (left nav › Workflows):
+   - Email to attendee on booking: include address, parking note, "bring vaccination records", 7:30 – 10:30 drop-off, 2 PM pickup.
+   - SMS to attendee 24 h before: restate the 50% policy in plain words.
+   - Email + push to **you** on every new booking and every cancellation.
+6. **Connect your calendar** (Google / Apple) so Cal never double-books.
+7. **Brand it**: Settings › Appearance › brand color `#1c1a17`, hide Cal branding if your plan allows.
+
+The `/intake` page is the new-client path. It emails you via Netlify Forms; turn on **Forms** in the Netlify dashboard (Site › Forms) or those submissions go nowhere.
+
 ## Booking — replace Tally with a real scheduler
 
 Tally is a form tool, not a scheduler — that's why appointment requests sometimes don't reach you in time. For a grooming business you want a system with calendar, intake, automatic email confirmations, and reminders on both sides.

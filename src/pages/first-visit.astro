@@ -1,0 +1,140 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/Section.astro";
+import { getCollection } from "astro:content";
+import { SITE } from "@/consts";
+
+const services = (await getCollection("services"))
+  .filter((s) => !s.data.addOn)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const steps = [
+  { title: "Book a drop-off time", body: "Pick a morning slot online. New clients fill in a short intake so we know your pet's breed, weight, coat, and temperament before you arrive." },
+  { title: "Drop off, 7:30 – 10:30 AM", body: `Bring vaccination records the first time. ${SITE.founder.short} does a quick coat and skin check with you, confirms the price, and you're off.` },
+  { title: "While you're away", body: "A text on arrival, a text mid-groom, a text when they're ready. If anything changes, you hear it before it happens, not after." },
+  { title: "Pick up at 2 PM", body: "Hand-checked, brushed, and calm. Come by anytime after 2. We don't kennel, so your pet isn't waiting in a crate." },
+];
+
+const faq = [
+  { q: "How much will it cost?", a: "Prices start at the numbers on our services page and go up with size, breed, and coat condition. You get the final number at drop-off, before we start. If anything changes mid-groom, we call before doing it." },
+  { q: "How often should my pet be groomed?", a: "Most doodles, poodles, and other curly coats: every 4 – 6 weeks. Double-coated breeds: a bath and de-shed every 6 – 8 weeks. Long-haired cats: every 6 – 8 weeks. We'll suggest a rhythm at your first visit." },
+  { q: "My dog is anxious. Is that a problem?", a: "No. Anxious, shy, and rescue dogs are a big part of who we see. One pet at a time, a quiet room, slow handling, and we stop if we need to. Tell us in the intake what helps and what doesn't." },
+  { q: "What if my pet is matted?", a: "Light matting combs out. Matting close to the skin is painful to brush, so the kind option is a shorter cut. We'll explain before we do anything, and we never charge for de-matting we shouldn't be doing." },
+  { q: "Can I stay and watch?", a: "Most pets do better without their person in the room — they settle faster. You're welcome to see the space at drop-off, and the texts keep you in the loop." },
+  { q: "What if I need to cancel?", a: "Free up to 24 hours before. Inside 24 hours, or a no-show, is a 50% fee. One groomer and one table means a missed slot can't be filled." },
+];
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faq.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+---
+
+<BaseLayout
+  title="Your First Visit"
+  description="What to expect at The Pet Affaire: drop-off and pickup times, what to bring, how pricing works, and how we handle anxious pets. Everything a new client needs before booking."
+>
+  <Section eyebrow="New here?" title="Your first visit, start to finish.">
+    <p class="-mt-6 mb-10 max-w-2xl text-lg text-black/75">
+      If you're new to grooming, new to the neighborhood, or new to us, this page has everything.
+      Five minutes of reading, no surprises on the day.
+    </p>
+    <ol class="grid gap-10 md:grid-cols-4 md:gap-6">
+      {steps.map((step, i) => (
+        <li>
+          <div class="flex items-center gap-3">
+            <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-cream)] font-display text-base text-[var(--color-clay)] ring-1 ring-black/15">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            {i < steps.length - 1 && <span aria-hidden="true" class="hidden h-px flex-1 bg-black/15 md:block"></span>}
+          </div>
+          <h3 class="mt-5 font-display text-xl">{step.title}</h3>
+          <p class="mt-2 text-[15px] leading-relaxed text-black/70">{step.body}</p>
+        </li>
+      ))}
+    </ol>
+  </Section>
+
+  <Section eyebrow="What to bring" title="Three things." bg="bone">
+    <ul class="grid gap-6 md:grid-cols-3 text-[15px] leading-relaxed text-black/75">
+      <li class="rounded-2xl border border-black/10 bg-white p-6">
+        <p class="text-xs uppercase tracking-[0.22em] text-[var(--color-clay)]">Vaccination records</p>
+        <p class="mt-3">Dogs: rabies and DHPP. Cats: FVRCP. A photo on your phone is fine. First visit only, then we keep it on file.</p>
+      </li>
+      <li class="rounded-2xl border border-black/10 bg-white p-6">
+        <p class="text-xs uppercase tracking-[0.22em] text-[var(--color-clay)]">A reference photo</p>
+        <p class="mt-3">If you have a look in mind, show us. "Like last time but shorter" works too. If you don't know, {SITE.founder.short} will suggest something that suits the coat.</p>
+      </li>
+      <li class="rounded-2xl border border-black/10 bg-white p-6">
+        <p class="text-xs uppercase tracking-[0.22em] text-[var(--color-clay)]">The honest version</p>
+        <p class="mt-3">Nervous around clippers? Hates the dryer? Bit someone once? Tell us. It changes how we work and it's never a reason to say no.</p>
+      </li>
+    </ul>
+  </Section>
+
+  <Section eyebrow="Pricing" title="Starting prices, so you can plan.">
+    <ul class="grid gap-6 md:grid-cols-3">
+      {services.map((s) => (
+        <li>
+          <a href={`/services/${s.id}/`} class="group block rounded-2xl border border-black/10 bg-white p-6 transition hover:-translate-y-0.5 hover:shadow-md">
+            <div class="flex items-baseline justify-between gap-4">
+              <h3 class="font-display text-2xl group-hover:underline">{s.data.title}</h3>
+              {s.data.priceFrom && <p class="whitespace-nowrap text-sm"><span class="text-black/55">from</span> <span class="font-medium">${s.data.priceFrom}</span></p>}
+            </div>
+            {s.data.duration && <p class="mt-1 text-xs uppercase tracking-wider text-black/50">{s.data.duration}</p>}
+            <p class="mt-3 text-sm text-black/70">{s.data.summary}</p>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p class="mt-8 max-w-2xl text-[15px] leading-relaxed text-black/70">
+      What moves the price: size, coat length, and condition. A matted doodle takes twice as long as
+      a well-brushed one. You'll get the exact number at drop-off and it won't change without a call.
+    </p>
+  </Section>
+
+  <Section eyebrow="The small print" title="Good to know." bg="rose" accent="rose">
+    <ul class="grid gap-6 md:grid-cols-2 text-[15px] leading-relaxed text-black/75">
+      <li><strong class="text-black">Hours.</strong> Tuesday to Saturday. Drop-off 7:30 – 10:30 AM, pickup 2 PM. Closed Sunday and Monday.</li>
+      <li><strong class="text-black">One pet at a time.</strong> Every groom gets full attention from check-in to pickup. It also means slots are limited, so book ahead.</li>
+      <li><strong class="text-black">Cancellations.</strong> Free up to 24 hours before. Inside 24 hours or no-show, 50% of the booked service.</li>
+      <li><strong class="text-black">Parking.</strong> Street parking on Lincoln and the side streets. We're just south of Pico. Look for the sign and walk in.</li>
+    </ul>
+  </Section>
+
+  <Section eyebrow="Questions" title="Things new clients ask.">
+    <ul class="divide-y divide-black/10 rounded-3xl border border-black/10 bg-white">
+      {faq.map((f) => (
+        <li class="p-6">
+          <details class="group">
+            <summary class="flex cursor-pointer items-start justify-between gap-4 list-none">
+              <span class="font-display text-xl">{f.q}</span>
+              <span class="text-black/40 transition group-open:rotate-45">+</span>
+            </summary>
+            <p class="mt-3 text-[15px] leading-relaxed text-black/75">{f.a}</p>
+          </details>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section bg="ink">
+    <div class="grid items-center gap-8 md:grid-cols-2">
+      <div>
+        <h2 class="font-display text-4xl md:text-5xl leading-tight">That's everything.</h2>
+        <p class="mt-4 max-w-md text-current/75">Pick a drop-off time and fill in the short intake. {SITE.founder.short} will confirm.</p>
+      </div>
+      <div class="flex flex-wrap gap-3 md:justify-end">
+        <a href="/book" class="rounded-full bg-[var(--color-cream)] px-5 py-3 text-sm text-[var(--color-ink)] hover:bg-white">Book online</a>
+        <a href={SITE.phoneHref} class="rounded-full border border-white/30 px-5 py-3 text-sm hover:border-white/70">Call {SITE.phone}</a>
+      </div>
+    </div>
+  </Section>
+
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+</BaseLayout>

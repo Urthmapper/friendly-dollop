@@ -30,7 +30,7 @@ const path = Astro.url.pathname;
 
     <div class="flex items-center gap-3">
       <a
-        href={SITE.bookingUrl}
+        href="/book"
         class="hidden sm:inline-flex items-center rounded-full bg-[var(--color-ink)] px-4 py-2 text-sm text-[var(--color-cream)] hover:bg-black"
       >
         Book
@@ -63,7 +63,7 @@ const path = Astro.url.pathname;
         </li>
       ))}
       <li class="mt-2">
-        <a class="inline-flex w-full justify-center rounded-full bg-[var(--color-ink)] px-4 py-3 text-sm text-[var(--color-cream)]" href={SITE.bookingUrl}>
+        <a class="inline-flex w-full justify-center rounded-full bg-[var(--color-ink)] px-4 py-3 text-sm text-[var(--color-cream)]" href="/book">
           Book an appointment
         </a>
       </li>
