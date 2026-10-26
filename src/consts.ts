@@ -14,7 +14,7 @@ export const SITE = {
     years: "2004 – 2022",
   },
   url: "https://thepetaffaire.com",
-  email: "hello@thepetaffaire.com",
+  email: "woof@thepetaffaire.com",
   phone: "(310) 396-0804",
   phoneHref: "tel:+13103960804",
   address: {
