@@ -1,6 +1,6 @@
 ---
 author: "Miu miu Nme"
-pet: "Multiple dogs over 30 years"
+pet: "Longtime client · multiple dogs"
 rating: 5
 source: "Google"
 date: 2025-10-22

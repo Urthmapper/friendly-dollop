@@ -57,7 +57,7 @@ a {
   .reveal {
     opacity: 0;
     transform: translateY(8px);
-    animation: reveal 0.7s ease forwards;
+    animation: reveal 0.35s ease-out forwards;
   }
   @keyframes reveal {
     to { opacity: 1; transform: none; }

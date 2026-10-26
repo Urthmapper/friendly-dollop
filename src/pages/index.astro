@@ -1,4 +1,6 @@
 ---
+import { Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Section from "@/components/Section.astro";
 import Reviews from "@/components/Reviews.astro";
@@ -9,6 +11,17 @@ import PhotoBand from "@/components/PhotoBand.astro";
 import { getCollection } from "astro:content";
 import { SITE } from "@/consts";
 import { galleryItems } from "@/data/gallery";
+import catPhoto from "@/assets/services/cat-groom.jpg";
+
+// Drop a portrait of Rod at src/assets/people/rod.{jpg,jpeg,png,webp} and the
+// founder block picks it up automatically. Until then it uses a studio shot.
+const people = import.meta.glob<ImageMetadata>("/src/assets/people/*.{jpg,jpeg,png,webp}", {
+  eager: true,
+  import: "default",
+});
+const rodPortrait =
+  Object.entries(people).find(([path]) => /\/rod\.(jpg|jpeg|png|webp)$/i.test(path))?.[1] ?? null;
+const founderPhoto = rodPortrait ?? galleryItems.meetGreet.src;
 
 const heroBand = [
   galleryItems.pomeranian,
@@ -26,96 +39,103 @@ const journal = (await getCollection("journal"))
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
   .slice(0, 2);
 
-const reviewCount = (await getCollection("reviews")).length;
+const reviews = await getCollection("reviews");
+const reviewCount = reviews.length;
+const avgRating = reviews.length
+  ? (reviews.reduce((n, r) => n + r.data.rating, 0) / reviews.length).toFixed(1)
+  : "5.0";
+
+const updates = [
+  { when: "On arrival", text: "Hemingway's here and settled in. Coat check done — we'll go a touch shorter on the belly like last time." },
+  { when: "Mid-groom", text: "Bath and dry finished, starting the scissor work. He's relaxed. Pickup still 2 PM." },
+  { when: "Ready", text: "All done and looking sharp. Come by anytime after 2 — he's napping by the window." },
+];
 ---
 
 <BaseLayout>
   <section class="relative">
-    <div class="mx-auto grid max-w-7xl gap-12 px-6 py-20 md:grid-cols-12 md:px-10 md:py-28">
-      <div class="md:col-span-7 reveal">
-        <p class="text-xs uppercase tracking-[0.22em] text-black/55">Santa Monica · Est. cared for</p>
+    <div class="mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-12 md:px-10 md:py-24">
+      <div class="md:col-span-7">
+        <p class="text-xs uppercase tracking-[0.22em] text-black/55">Santa Monica · Since {SITE.founded}</p>
         <h1 class="mt-5 font-display text-5xl leading-[1.02] md:text-7xl">
           Gentle Grooming.<br class="hidden md:block" />
           <span class="italic text-[var(--color-clay)]">Tail-Wagging Results.</span>
         </h1>
-        <p class="mt-8 text-xs uppercase tracking-[0.22em] text-[var(--color-clay)]">Our Pet Affaire Promise</p>
-        <p class="mt-3 max-w-xl text-lg text-black/75">
-          From shy rescues to high-energy pups, we meet every pet exactly where they are. We
-          gently adjust our pace, touch, and handling with patience and empathy, creating a calm,
-          loving experience that builds trust — one groom at a time.
+        <p class="mt-7 max-w-lg text-lg leading-snug text-black/75 md:text-xl">
+          One pet at a time. Scissor-finished by hand. Honest prices. No kennels.
         </p>
-        <p class="mt-5 max-w-xl font-display text-xl md:text-2xl italic leading-snug text-black/85">
-          Grooming That Respects.<br />Every Pet. Every Time.
-        </p>
-        <div class="mt-8 flex flex-wrap gap-3">
-          <a href="/book" class="inline-flex items-center rounded-full bg-[var(--color-ink)] px-5 py-3 text-sm text-[var(--color-cream)] hover:bg-black">
-            Book an appointment
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a href="/book" class="inline-flex items-center rounded-full bg-[var(--color-ink)] px-6 py-3.5 text-sm text-[var(--color-cream)] hover:bg-black">
+            Book online
           </a>
-          <a href="/services" class="inline-flex items-center rounded-full border border-black/15 px-5 py-3 text-sm hover:border-black/40">
-            See services & pricing
+          <a href={SITE.phoneHref} class="inline-flex items-center gap-2 rounded-full border border-black/15 px-5 py-3.5 text-sm hover:border-black/40 hover:bg-white">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.86 19.86 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            Call {SITE.founder.short} · {SITE.phone}
           </a>
         </div>
-        <div class="mt-12 grid max-w-xl gap-10 sm:grid-cols-2">
-          <div>
-            <p class="text-xs uppercase tracking-[0.22em] text-black/55">We're open</p>
-            <ul class="mt-3 space-y-1 text-sm">
-              {SITE.hoursDetailed.map((h) => (
-                <li class="flex justify-between gap-6">
-                  <span class="font-medium">{h.day}</span>
-                  <span class="text-black/65">{h.hours}</span>
-                </li>
-              ))}
-            </ul>
-            <p class="mt-3 text-xs italic text-black/55">{SITE.closedNote}</p>
-          </div>
-          <div class="flex flex-col items-start justify-end">
-            <p class="text-xs uppercase tracking-[0.22em] text-black/55">Call to schedule</p>
-            <a
-              href={SITE.phoneHref}
-              class="mt-3 inline-flex items-center gap-2 rounded-full border border-black/15 px-5 py-3 text-base hover:border-black/40 hover:bg-white"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.86 19.86 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
-              <span class="font-medium">{SITE.phone}</span>
-            </a>
-            <p class="mt-2 text-xs text-black/55">Or <a class="underline" href="/intake">fill out the booking form</a>.</p>
-          </div>
-        </div>
+        <a href="/reviews" class="mt-7 inline-flex items-center gap-3 text-sm text-black/65 hover:text-black">
+          <span class="tracking-widest text-[var(--color-clay)]" aria-hidden="true">★★★★★</span>
+          <span>{avgRating} on Google · {reviewCount} reviews</span>
+        </a>
+        <p class="mt-10 text-sm text-black/55">
+          Tue – Sat · drop-off 7:30 – 10:30 AM · <a href="/first-visit" class="underline underline-offset-4 hover:text-black">First visit? Start here</a>
+        </p>
       </div>
 
-      <aside class="md:col-span-5 md:pl-6 reveal">
+      <aside class="md:col-span-5 md:pl-6">
         <div class="relative">
           <span
             aria-hidden="true"
             class="absolute inset-0 -z-10 rounded-3xl bg-[var(--color-clay)] opacity-35 translate-x-3 translate-y-3 md:translate-x-4 md:translate-y-4"
           ></span>
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 64 64"
-            class="pointer-events-none absolute -top-7 -left-5 h-20 w-20 -rotate-[14deg] text-[var(--color-clay)] opacity-55 md:h-24 md:w-24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.4"
-            stroke-linecap="round"
-          >
-            <ellipse cx="32" cy="44" rx="14" ry="11" />
-            <ellipse cx="13" cy="26" rx="5" ry="7" />
-            <ellipse cx="25" cy="14" rx="5" ry="7" />
-            <ellipse cx="39" cy="14" rx="5" ry="7" />
-            <ellipse cx="51" cy="26" rx="5" ry="7" />
-          </svg>
           <HeroMedia />
         </div>
       </aside>
     </div>
   </section>
 
+  <Section eyebrow="The studio" title="Two hands, one table, since 2004." bg="bone" accent="clay">
+    <div class="grid items-center gap-10 md:grid-cols-12">
+      <div class="md:col-span-5">
+        <div class="relative aspect-[4/5] overflow-hidden rounded-3xl bg-[var(--color-mist)]">
+          <Picture
+            src={founderPhoto}
+            formats={["avif", "webp"]}
+            alt={rodPortrait ? `${SITE.founder.name}, owner and groomer at The Pet Affaire.` : "A morning at The Pet Affaire studio in Santa Monica."}
+            widths={[400, 600, 800, 1000]}
+            sizes="(max-width: 768px) 100vw, 42vw"
+            loading="lazy"
+            decoding="async"
+            class="h-full w-full object-cover"
+          />
+        </div>
+      </div>
+      <div class="md:col-span-7 md:pl-6">
+        <p class="font-display text-2xl leading-snug text-black/85 md:text-3xl">
+          I'm {SITE.founder.short}. I opened this studio with {SITE.cofounder.name} in {SITE.founded},
+          and I'm still the one holding the scissors.
+        </p>
+        <p class="mt-6 max-w-xl text-[17px] leading-relaxed text-black/75">
+          No assembly line, no handing your dog off to whoever's free. You drop off with me, I do
+          the work, and you pick up from me. That's how it's been since the beginning, and it's
+          why most of our clients have been coming for years.
+        </p>
+        <p class="mt-4 max-w-xl text-[17px] leading-relaxed text-black/75">
+          Frank was the backbone of this place and the reason I take the craft as seriously as I
+          do. He passed in 2022. The way we work is still his way.
+        </p>
+        <p class="mt-6 font-display text-xl italic text-black/70">— {SITE.founder.short}</p>
+        <a href="/about" class="mt-6 inline-block text-sm underline underline-offset-4 hover:text-black">More about the studio →</a>
+      </div>
+    </div>
+  </Section>
+
   <Section
     eyebrow="What we do"
     title="A short list of services, done very well."
     intro="Every visit includes a coat assessment, a calm intro, and a finish that's hand-checked before your pet leaves."
-    bg="bone"
   >
     <ul class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {services.map((s) => (
@@ -128,8 +148,9 @@ const reviewCount = (await getCollection("reviews")).length;
               </span>
             </div>
             <p class="mt-3 flex-1 text-sm text-black/70">{s.data.summary}</p>
-            <p class="mt-5 text-sm">
+            <p class="mt-5 flex items-baseline justify-between text-sm">
               {s.data.duration && <span class="text-black/55">{s.data.duration}</span>}
+              {s.data.priceFrom && <span><span class="text-black/55">from</span> <span class="font-medium">${s.data.priceFrom}</span></span>}
             </p>
           </a>
         </li>
@@ -140,7 +161,67 @@ const reviewCount = (await getCollection("reviews")).length;
     </div>
   </Section>
 
-  <Section eyebrow="From the studio" title="Recent visitors." accent="rose">
+  <Section eyebrow="While you're away" title="You'll hear from us three times." bg="sage" accent="sage">
+    <div class="grid gap-10 md:grid-cols-12">
+      <div class="md:col-span-5">
+        <p class="max-w-md text-[17px] leading-relaxed text-black/75">
+          If you're the kind of person who worries the whole time your dog is at the groomer, you're
+          our kind of person. A text when they arrive, a text mid-groom, and a text when they're
+          ready. Nothing surprises you, including the price.
+        </p>
+        <ul class="mt-8 space-y-3 text-[15px] text-black/75">
+          <li class="flex gap-3"><span class="text-[var(--color-clay)]">·</span> If a groom will cost more than quoted, you hear it before we begin.</li>
+          <li class="flex gap-3"><span class="text-[var(--color-clay)]">·</span> If a groom isn't safe to finish, we stop and call you.</li>
+          <li class="flex gap-3"><span class="text-[var(--color-clay)]">·</span> Pickup is 2 PM. Your pet is never left in a kennel waiting.</li>
+        </ul>
+      </div>
+      <div class="md:col-span-7 md:pl-6">
+        <ol class="space-y-4">
+          {updates.map((u) => (
+            <li class="flex flex-col gap-1 sm:max-w-lg">
+              <span class="text-[11px] uppercase tracking-[0.2em] text-black/45">{u.when}</span>
+              <p class="rounded-2xl rounded-tl-sm bg-white px-5 py-4 text-[15px] leading-relaxed text-black/85 shadow-[0_1px_0_rgba(0,0,0,0.05)]">
+                {u.text}
+              </p>
+            </li>
+          ))}
+        </ol>
+        <p class="mt-4 text-xs text-black/45">Example messages.</p>
+      </div>
+    </div>
+  </Section>
+
+  <Section eyebrow="For cats" title="Yes, we groom cats. Properly." accent="rose">
+    <div class="grid items-center gap-10 md:grid-cols-12">
+      <div class="md:col-span-7">
+        <p class="max-w-xl text-[17px] leading-relaxed text-black/75">
+          Most grooming shops in Los Angeles won't take cats, or take them badly. We book cats into
+          a quiet window with no dogs in the room, work slowly, and never sedate. Lion cuts, comb
+          cuts, mat removal, nails, ears, and a bath only when it's needed.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href="/services/cat-groom/" class="rounded-full bg-[var(--color-ink)] px-5 py-3 text-sm text-[var(--color-cream)] hover:bg-black">Cat grooming, from $35</a>
+          <a href="/journal/cat-grooming-myths" class="rounded-full border border-black/15 px-5 py-3 text-sm hover:border-black/40">Three myths about cat grooming</a>
+        </div>
+      </div>
+      <div class="md:col-span-5">
+        <div class="aspect-[5/4] overflow-hidden rounded-3xl bg-[var(--color-bone)]">
+          <Picture
+            src={catPhoto}
+            formats={["avif", "webp"]}
+            alt="A grey cat being gently rinsed at The Pet Affaire."
+            widths={[400, 600, 800]}
+            sizes="(max-width: 768px) 100vw, 40vw"
+            loading="lazy"
+            decoding="async"
+            class="h-full w-full object-cover"
+          />
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <Section eyebrow="From the studio" title="Recent visitors." bg="bone">
     <PhotoBand items={heroBand} aspect="square" />
     <p class="mt-6 text-sm text-black/55">
       A handful of friends from this season — see more in the <a href="/gallery" class="underline underline-offset-4 hover:text-black">gallery</a>.
@@ -152,17 +233,17 @@ const reviewCount = (await getCollection("reviews")).length;
       <div>
         <p class="text-xs uppercase tracking-[0.22em] text-[var(--color-clay)]">Gentle &amp; safe</p>
         <h3 class="mt-2 font-display text-xl text-black">Comfort first, every visit.</h3>
-        <p class="mt-3">Calm rooms, slow handling, and one pet at a time so cats and dogs feel safe — not stressed. No all-day waits, no rushed hands.</p>
+        <p class="mt-3">Calm rooms, slow handling, and one pet at a time so cats and dogs feel safe, not stressed. No all-day waits, no rushed hands.</p>
       </div>
       <div>
         <p class="text-xs uppercase tracking-[0.22em] text-[var(--color-clay)]">Precision &amp; craft</p>
-        <h3 class="mt-2 font-display text-xl text-black">Hand-finished by experienced groomers.</h3>
-        <p class="mt-3">Reputation built groom by groom. Scissor finishing on every cut, a real eye for line and proportion, and the patience to do it right — because grooming, done well, is an art form.</p>
+        <h3 class="mt-2 font-display text-xl text-black">Hand-finished, every cut.</h3>
+        <p class="mt-3">Scissor finishing on every groom, a real eye for line and proportion, and the patience to do it right. Grooming, done well, is an art form.</p>
       </div>
       <div>
-        <p class="text-xs uppercase tracking-[0.22em] text-[var(--color-clay)]">Community &amp; value</p>
-        <h3 class="mt-2 font-display text-xl text-black">Honest prices for high-end work.</h3>
-        <p class="mt-3">We've been part of this neighborhood for decades and we want to stay accessible. Quality stays high, prices stay fair, and you'll always know what you're paying for before we start.</p>
+        <p class="text-xs uppercase tracking-[0.22em] text-[var(--color-clay)]">Honest value</p>
+        <h3 class="mt-2 font-display text-xl text-black">High-end work, neighborhood prices.</h3>
+        <p class="mt-3">We've been on Lincoln since {SITE.founded} and we intend to stay affordable. Quality stays high, prices stay fair, and you always know the number before we start.</p>
       </div>
     </div>
   </Section>
@@ -174,9 +255,7 @@ const reviewCount = (await getCollection("reviews")).length;
       {reviewCount > 3 && (
         <a href="/reviews" class="text-sm underline underline-offset-4 hover:text-black">Read all reviews →</a>
       )}
-      <a href={SITE.social.google} class="text-sm underline underline-offset-4 hover:text-black">
-        {reviewCount > 3 ? "Leave a Google review" : "Leave a Google review →"}
-      </a>
+      <a href={SITE.social.google} class="text-sm underline underline-offset-4 hover:text-black">Leave a Google review →</a>
     </div>
   </Section>
 
@@ -196,7 +275,7 @@ const reviewCount = (await getCollection("reviews")).length;
     </ul>
   </Section>
 
-  <Section eyebrow="Visit" title="3013 Lincoln Boulevard." bg="bone">
+  <Section eyebrow="Visit" title="On Lincoln, just south of Pico." bg="bone">
     <div class="grid items-stretch gap-10 md:grid-cols-12">
       <div class="md:col-span-7">
         <Map height="380px" />
@@ -206,14 +285,17 @@ const reviewCount = (await getCollection("reviews")).length;
           <div>
             <p class="text-xs uppercase tracking-[0.22em] text-black/55">Address</p>
             <p class="mt-2">3013 Lincoln Boulevard<br />Santa Monica, CA 90405</p>
+            <p class="mt-2 text-sm text-black/55">Street parking on Lincoln and the side streets. Look for our sign and walk in.</p>
           </div>
           <div>
             <p class="text-xs uppercase tracking-[0.22em] text-black/55">Hours</p>
             <ul class="mt-2 space-y-1">
-              {SITE.hours.map((h) => (
+              {SITE.hoursDetailed.map((h) => (
                 <li class="flex justify-between gap-6"><span>{h.day}</span><span class="text-black/55">{h.hours}</span></li>
               ))}
+              <li class="flex justify-between gap-6"><span>Sun – Mon</span><span class="text-black/55">Closed</span></li>
             </ul>
+            <p class="mt-2 text-sm text-black/55">Drop-off 7:30 – 10:30 AM · Pickup 2 PM</p>
           </div>
           <div>
             <p class="text-xs uppercase tracking-[0.22em] text-black/55">Reach us</p>
@@ -235,12 +317,12 @@ const reviewCount = (await getCollection("reviews")).length;
       <div>
         <h2 class="font-display text-4xl md:text-5xl leading-tight">Ready when you are.</h2>
         <p class="mt-4 max-w-md text-current/75">
-          Real-time availability, automatic confirmations, and reminders so nothing slips.
+          Pick a drop-off time online. New clients get a short intake so {SITE.founder.short} knows your pet before you arrive.
         </p>
       </div>
       <div class="flex flex-wrap gap-3 md:justify-end">
         <a href="/book" class="rounded-full bg-[var(--color-cream)] px-5 py-3 text-sm text-[var(--color-ink)] hover:bg-white">
-          Book an appointment
+          Book online
         </a>
         <a href={SITE.phoneHref} class="rounded-full border border-white/30 px-5 py-3 text-sm hover:border-white/70">
           Call {SITE.phone}

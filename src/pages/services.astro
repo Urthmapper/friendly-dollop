@@ -17,9 +17,9 @@ const addOns = all.filter((s) => s.data.addOn);
     intro="Every visit includes a thoughtful coat assessment, a gentle introduction to put your pet at ease, and a beautifully finished result that's carefully hand-checked before they head home."
   >
     <p class="-mt-6 mb-12 max-w-3xl text-base text-black/70">
-      Pricing is thoughtfully determined by many variables — including breed, coat condition,
-      size, and individual needs — so we're unable to list fixed rates here. Each price below is
-      a starting point; we're happy to provide a personalized quote when you reach out.
+      Prices start here. Breed, size, and coat condition can add to it, and you'll know the
+      number before we begin — never after. Want a quote for your pet? Tell us the breed and
+      the last groom date when you <a href="/book" class="underline underline-offset-4 hover:text-black">book</a>.
     </p>
 
     <div class="grid gap-12 lg:grid-cols-2">
@@ -44,10 +44,7 @@ const addOns = all.filter((s) => s.data.addOn);
                 <p class="mt-3 text-sm text-black/75">{s.data.summary}</p>
                 {s.data.includes.length > 0 && (
                   <ul class="mt-4 space-y-1 text-sm text-black/70">
-                    {s.data.includes.slice(0, 3).map((i) => <li class="flex gap-2"><span class="text-[var(--color-clay)]">·</span> {i}</li>)}
-                    {s.data.includes.length > 3 && (
-                      <li class="text-xs text-black/45">+{s.data.includes.length - 3} more</li>
-                    )}
+                    {s.data.includes.map((i) => <li class="flex gap-2"><span class="text-[var(--color-clay)]">·</span> {i}</li>)}
                   </ul>
                 )}
                 <p class="mt-4 text-sm underline underline-offset-4">Details & booking →</p>
@@ -78,10 +75,7 @@ const addOns = all.filter((s) => s.data.addOn);
                 <p class="mt-3 text-sm text-black/75">{s.data.summary}</p>
                 {s.data.includes.length > 0 && (
                   <ul class="mt-4 space-y-1 text-sm text-black/70">
-                    {s.data.includes.slice(0, 3).map((i) => <li class="flex gap-2"><span class="text-[var(--color-clay)]">·</span> {i}</li>)}
-                    {s.data.includes.length > 3 && (
-                      <li class="text-xs text-black/45">+{s.data.includes.length - 3} more</li>
-                    )}
+                    {s.data.includes.map((i) => <li class="flex gap-2"><span class="text-[var(--color-clay)]">·</span> {i}</li>)}
                   </ul>
                 )}
                 <p class="mt-4 text-sm underline underline-offset-4">Details & booking →</p>
@@ -93,7 +87,7 @@ const addOns = all.filter((s) => s.data.addOn);
     </div>
   </Section>
 
-  <Section bg="bone" eyebrow="Added Extras" title="Spa add-ons.">
+  <Section id="add-ons" bg="bone" eyebrow="Added Extras" title="Spa add-ons.">
     <p class="-mt-6 mb-8 max-w-2xl text-black/70 text-[15px]">
       Tell us which extras you'd like at booking, or add them on the day. The "+" indicates pricing
       may rise slightly with extra time, coat density, or product use.
@@ -123,5 +117,8 @@ const addOns = all.filter((s) => s.data.addOn);
       <li><strong class="text-black">Vaccinations.</strong> Rabies and DHPP for dogs, FVRCP for cats. Bring proof at the first visit.</li>
       <li><strong class="text-black">Late & no-show.</strong> A 50% fee for no-shows or cancellations under 24 hours, so we can keep prices fair.</li>
     </ul>
+    <p class="mt-8 text-sm text-black/60">
+      New here? Everything above and more is on the <a href="/first-visit" class="underline underline-offset-4 hover:text-black">first-visit page</a>.
+    </p>
   </Section>
 </BaseLayout>
